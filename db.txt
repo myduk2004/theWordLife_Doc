@@ -1,3 +1,41 @@
+CREATE TABLE Common_Code (
+    code_type VARCHAR(50) NOT NULL COMMENT '코드 분류 (예: PRAYER_TYPE)',
+    code_id   VARCHAR(20) NOT NULL COMMENT '코드값 (예: PRY)',
+    code_name VARCHAR(100) NOT NULL COMMENT '코드명 (예: 일반기도)',
+    description TEXT NULL COMMENT '설명',
+    order_no   INT NOT NULL DEFAULT 0 COMMENT '정렬순서',
+    is_active CHAR(1) NOT NULL DEFAULT 'Y' COMMENT '코드 사용 여부(Y / N)',
+    reg_dt    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
+    upd_dt    DATETIME NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+    PRIMARY KEY (code_type, code_id)
+) COMMENT '공통 코드 관리';
+
+
+-- 기도 종류 (PRAYER_TYPE)
+INSERT INTO Common_Code (code_type, code_id, code_name, description, order_no)
+VALUES 
+('PRAYER_TYPE', 'PRY', '일반기도', '개인적인 일반 기도', 1),
+('PRAYER_TYPE', 'THK', '감사기도', '감사에 대한 기도', 2),
+('PRAYER_TYPE', 'INT', '중보기도', '다른 사람을 위한 기도', 3),
+('PRAYER_TYPE', 'REP', '회개기도', '회개와 용서를 구하는 기도', 4),
+('PRAYER_TYPE', 'WOR', '예배기도', '예배 중 드리는 기도', 5);
+
+-- 응답 상태 (ANSWER_STATUS)
+INSERT INTO Common_Code (code_type, code_id, code_name, description, order_no)
+VALUES
+('ANSWER_STATUS', 'N', '미응답', '아직 응답되지 않음', 1),
+('ANSWER_STATUS', 'Y', '응답됨', '기도가 응답됨', 2),
+('ANSWER_STATUS', 'P', '진행중', '응답을 기다리는 중', 3);
+
+-- 공유 여부 (SHARE_YN)
+INSERT INTO Common_Code (code_type, code_id, code_name, description, order_no)
+VALUES
+('SHARE_YN', 'N', '공유안함', '개인 기도로만 사용', 1),
+('SHARE_YN', 'Y', '공유', '다른 사람과 공유됨', 2);
+
+
+
+
 CREATE TABLE Prayer
 (
   prayer_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT '기도id',
