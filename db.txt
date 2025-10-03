@@ -1,0 +1,406 @@
+CREATE TABLE Prayer
+(
+  prayer_id BIGINT       NOT NULL AUTO_INCREMENT COMMENT '기도id',
+  userId    BIGINT       NOT NULL COMMENT '사용자id',
+  prayer_dt DATE         NOT NULL COMMENT '기도일',
+  title     VARCHAR(100) NOT NULL COMMENT '기도전체제목',
+  note      TEXT         NULL     COMMENT '노트',
+  reg_dt    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
+  upd_dt    DATETIME     NULL     DEFAULT  CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+  PRIMARY KEY (prayer_id)
+) COMMENT '기도';
+
+
+
+
+CREATE TABLE Prayer_topic
+(
+  prayer_id     BIGINT       NOT NULL COMMENT '기도id',
+  topic_id      BIGINT       NOT NULL  AUTO_INCREMENT COMMENT '기도제목id',
+  topic_type    CHAR(3)      NOT NULL COMMENT '기도종류(PRY:일반기도, THK:감사, INT:중보,REP:회개,WOR:예배기도)',
+  topic         VARCHAR(300) NOT NULL COMMENT '기도제목',
+  target_name   VARCHAR(100) NULL     COMMENT '기도대상명(중보기도시)',
+  answer_status CHAR(1)      NOT NULL COMMENT '응답상태',
+  answer_note   VARCHAR(300) NULL     COMMENT '응답메모',
+  order_no      TINYINT      NOT NULL COMMENT '정렬순서',
+  share_yn      CHAR(1)      NOT NULL COMMENT '공유구분(N:공유안함, Y:공유)',
+  share_dt      DATETIME     NULL     COMMENT '공유일',
+  reg_dt        DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
+  upd_dt        DATETIME     NULL     DEFAULT  CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+  PRIMARY KEY (topic_id)
+) COMMENT '기도제목';
+
+
+
+
+
+
+
+
+CREATE TABLE Users
+(
+  userId   BIGINT(20)   NOT NULL AUTO_INCREMENT COMMENT '사용자id',
+  password VARCHAR(255) NOT NULL COMMENT '비밀번호',
+  name     VARCHAR(100) NOT NULL COMMENT '이름',
+  nickname VARCHAR(100) NULL     COMMENT '별명',
+  phone    VARCHAR(20)  NOT NULL COMMENT '전화번호',
+  email    VARCHAR(100) NOT NULL UNIQUE COMMENT '이메일', 
+  role     VARCHAR(20) NOT NULL DEFAULT 'USER' COMMENT '권한:USER,ADMIN,MANAGER',
+  address  VARCHAR(200) NULL     COMMENT '주소',
+  reg_dt   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
+  upd_dt   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
+  PRIMARY KEY (userId)
+) COMMENT '사용자정보';
+
+CREATE USER 'thewordlife_web'@'%' IDENTIFIED BY 'thewordinmylife!@#';
+GRANT ALL PRIVILEGES ON thewordlife.* TO 'thewordlife_web'@'%';
+FLUSH PRIVILEGES;
+
+ALTER USER 'thewordlife_web'@'%' IDENTIFIED WITH mysql_native_password BY 'thewordinmylife!@#';
+FLUSH PRIVILEGES;
+
+
+
+
+
+
+ CREATE TABLE bible_version
+(
+  version_id   VARCHAR(20)  NOT NULL PRIMARY KEY COMMENT '버전아이디: KRV, KJV, NIV',
+  version_name VARCHAR(100) NOT NULL COMMENT '버전명: 표준킹제임스성경',
+  language     VARCHAR(10)  NULL     COMMENT '언어 : ko',
+  publisher    VARCHAR(100) NULL     COMMENT '출판사명: 바이블빌리버',
+  published_dt DATE  NULL     COMMENT '출판일 : 2025-07-01',
+  style_origin varchar(20)  NULL     COMMENT '성경계열 : KJV or NIV ',
+  order_no     SMALLINT     NULL      COMMENT '순서',
+  is_used      TINYINT      NULL     DEFAULT 1 COMMENT '사용여부:true',
+  upd_dt       TIMESTAMP    NULL     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일:2025-07-01'
+) COMMENT '성경 번역본 정보';
+
+
+
+
+ CREATE TABLE bible_book 
+(
+  book_id       SMALLINT NOT NULL     COMMENT '성경의 책 순서 (1~66)',
+  version_id    VARCHAR(20)  NOT NULL     COMMENT '성경 번역 ID (FK)',
+  book_code     VARCHAR(20)  NOT NULL     COMMENT '성경 책 코드 (예: GEN)',
+  name_ko       VARCHAR(100) NOT NULL     COMMENT '책 이름 (한글)',
+  name_en       VARCHAR(100) NOT NULL     COMMENT '책 이름 (영문)',
+  title         VARCHAR(100) NULL     COMMENT '책 제목',
+  testament     VARCHAR(10)  NOT NULL     COMMENT '신/구약여부: OLDT, NEWT',
+  book_abbr     VARCHAR(20)  NOT NULL COMMENT '각 버전별 약어 (예: Gen, Ge, 창 등)',
+  chapter_count SMALLINT     NOT NULL     COMMENT '장 수',
+  status        TINYINT      NOT NULL DEFAULT 0 COMMENT '0=시작전, 1=진행중, 2=완료',
+  upd_dt        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일', 
+  PRIMARY KEY (book_id, version_id), 
+  CONSTRAINT fk_bible_book_version FOREIGN KEY (version_id) REFERENCES bible_version(version_id)
+) COMMENT '번역본별 책 정보';
+
+
+CREATE TABLE bible_verse
+(
+  verse_id   BIGINT        NOT NULL AUTO_INCREMENT  COMMENT '절 ID',
+  version_id VARCHAR(20)   NOT NULL COMMENT '성경 번역 ID (FK)',
+  book_id    SMALLINT      NOT NULL COMMENT '책 ID (FK)',
+  chapter    SMALLINT           NOT NULL COMMENT '장',
+  verse      SMALLINT           NOT NULL COMMENT '절',
+  text       VARCHAR(2000) NOT NULL COMMENT '본문',
+  reg_id     BIGINT        NOT NULL COMMENT '등록자 ID',
+  reg_dt     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
+  upd_id     BIGINT        NULL COMMENT '수정자 ID',
+  upd_dt     TIMESTAMP     NULL ON UPDATE CURRENT_TIMESTAMP  COMMENT '수정일', 
+  PRIMARY KEY(verse_id), 
+  UNIQUE KEY uq_bible_verse(version_id, book_id, chapter, verse)
+) COMMENT '성경 본문';
+
+
+
+CREATE TABLE Meditation
+(
+  meditation_id BIGINT    	NOT NULL AUTO_INCREMENT COMMENT '묵상id',
+  userId        BIGINT   	NOT NULL COMMENT '사용자id',
+  meditation_dt DATE   		NOT NULL COMMENT '묵상일',
+  title         VARCHAR(100)  NULL     COMMENT '제목',
+  note          TEXT		 NOT NULL COMMENT '내용',
+  reg_dt        DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '등록일',
+  upd_dt        DATETIME      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP     COMMENT '수정일',
+  PRIMARY KEY (meditation_id)
+) COMMENT '묵상';
+
+
+
+CREATE TABLE Meditation_Verse
+(
+  meditation_id BIGINT      NOT NULL COMMENT '묵상id',
+  group_id      TINYINT     NOT NULL COMMENT '그룹번호',
+  verse_id      BIGINT      NOT NULL COMMENT '성경id', 
+  group_order   TINYINT     NOT NULL COMMENT '그룹순서',
+  order_no      TINYINT     NOT NULL COMMENT '그룹내 순서',
+  bookmark      TINYINT     NULL     COMMENT '북마크',
+  highlighter   VARCHAR(50) NULL     COMMENT '하이라이터색',
+  PRIMARY KEY (meditation_id, group_id, verse_id)
+) COMMENT '묵상 말씀';
+ 
+
+insert into bible_version(version_id, version_name, language, publisher, published_dt, style_origin, order_no)
+select 'KSKJB', '표준킹제임스성경', 'ko', '바이블빌리버', '2023-04-17', 'KJV', 1;
+
+
+insert into bible_version(version_id, version_name, language, publisher, published_dt, style_origin, order_no)
+select 'KJVKO', '킹제임스흠정역 성경', 'ko', '그리스도예수안에', '2021-05-02', 'KJV',2;
+ 
+
+insert into bible_version(version_id, version_name, language, publisher, published_dt, style_origin, order_no)
+select 'KKJV', '한글킹제임스성경', 'ko', '말씀보존학회', '1994-04-12', 'KJV', 3;
+
+
+
+ insert into bible_book (book_id, version_id, book_code, name_ko, name_en, testament, book_abbr, chapter_count, title)
+values (1, 'KSKJB', 'GEN', '창세기', 'Genesis', 'OLDT', '(창)', 50, ' 태초라 불리는, 모세의 첫 번째 책')
+,(2, 'KSKJB', 'EXO', '출애굽기', 'Exodus', 'OLDT', '(출)', 40, '대탈출이라 불리는, 모세의 두 번째 책')
+,(3, 'KSKJB', 'LEV', '레위기', 'Leviticus', 'OLDT', '(레)', 27, '레위인들에 관한 법이라 불리는, 모세의 세 번째 책')
+,(4, 'KSKJB', 'NUM', '민수기', 'Numbers', 'OLDT', '(민)', 36, '계수라 불리는, 모세의 네 번째 책')
+,(5, 'KSKJB', 'DEU', '신명기', 'Deuteronomy', 'OLDT', '(신)', 34, '율법의 반복이라 불리는, 모세의 다섯 번째 책 ')
+,(6, 'KSKJB', 'JOS', '여호수아기', 'Joshua', 'OLDT', '(수)', 24, '')
+,(7, 'KSKJB', 'JDG', '사사기', 'Judges', 'OLDT', '(삿)', 21, '')
+,(8, 'KSKJB', 'RUT', '룻기', 'Ruth', 'OLDT', '(룻)', 4, '')
+,(9, 'KSKJB', '1SA', '사무엘기상', '1 Samuel', 'OLDT', '(삼상)', 31, '왕들에 관한 첫 번째 책이라고도 불리는, 사무엘의 첫 번째 책')
+,(10, 'KSKJB', '2SA', '사무엘기하', '2 Samuel', 'OLDT', '(삼하)', 24, '왕들에 관한 두 번째 책이라고도 불리는, 사무엘의 두 번째 책')
+,(11, 'KSKJB', '1KI', '열왕기상', '1 Kings', 'OLDT', '(왕상)', 22, '일반적으로 왕들에 관한 세 번째 책이라고 불리는, 왕들에 관한 첫 번째 책')
+,(12, 'KSKJB', '2KI', '열왕기하', '2 Kings', 'OLDT', '(왕하)', 25, '일반적으로 왕들에 관한 네 번째 책이라고 불리는, 왕들에 관한 두 번째 책')
+,(13, 'KSKJB', '1CH', '역대기상', '1 Chronicles', 'OLDT', '(대상)', 29, '첫번째 연대기')
+,(14, 'KSKJB', '2CH', '역대기하', '2 Chronicles', 'OLDT', '(대하)', 36, '두번째 연대기')
+,(15, 'KSKJB', 'EZR', '에스라', 'Ezra', 'OLDT', '(스)', 10, '')
+,(16, 'KSKJB', 'NEH', '느헤미야기', 'Nehemiah', 'OLDT', '(느)', 13, '')
+,(17, 'KSKJB', 'EST', '에스더기', 'Esther', 'OLDT', '(에)', 10, '')
+,(18, 'KSKJB', 'JOB', '욥기', 'Job', 'OLDT', '(욥)', 42, '')
+,(19, 'KSKJB', 'PSA', '시편', 'Psalms', 'OLDT', '(시)', 150, '')
+,(20, 'KSKJB', 'PRO', '잠언', 'Proverbs', 'OLDT', '(잠)', 31, '')
+,(21, 'KSKJB', 'ECC', '전도서', 'Ecclesiastes', 'OLDT', '(전)', 12, '또는 선포자')
+,(22, 'KSKJB', 'SNG', '솔로몬의 아가', 'Song of Solomon', 'OLDT', '(아)', 8, '')
+,(23, 'KSKJB', 'ISA', '이사야서', 'Isaiah', 'OLDT', '(사)', 66, '예언자 이사야의 책')
+,(24, 'KSKJB', 'JER', '예레미야서', 'Jeremiah', 'OLDT', '(렘)', 52, '예언자 예레미야의 책')
+,(25, 'KSKJB', 'LAM', '예레미야 애가', 'Lamentations', 'OLDT', '(애)', 5, '')
+,(26, 'KSKJB', 'EZK', '에스겔서', 'Ezekiel', 'OLDT', '(겔)', 48, '예언자 에스겔의 책')
+,(27, 'KSKJB', 'DAN', '다니엘서', 'Daniel', 'OLDT', '(단)', 12, '')
+,(28, 'KSKJB', 'HOS', '호세아', 'Hosea', 'OLDT', '(호)', 14, '')
+,(29, 'KSKJB', 'JOL', '요엘', 'Joel', 'OLDT', '(욜)', 3, '')
+,(30, 'KSKJB', 'AMO', '아모스', 'Amos', 'OLDT', '(암)', 9, '')
+,(31, 'KSKJB', 'OBA', '오바댜', 'Obadiah', 'OLDT', '(옵)', 1, '')
+,(32, 'KSKJB', 'JON', '요나', 'Jonah', 'OLDT', '(욘)', 4, '')
+,(33, 'KSKJB', 'MIC', '미가', 'Micah', 'OLDT', '(미)', 7, '')
+,(34, 'KSKJB', 'NAM', '나훔', 'Nahum', 'OLDT', '(나)', 3, '')
+,(35, 'KSKJB', 'HAB', '하박국', 'Habakkuk', 'OLDT', '(합)', 3, '')
+,(36, 'KSKJB', 'ZEP', '스바냐', 'Zephaniah', 'OLDT', '(습)', 3, '')
+,(37, 'KSKJB', 'HAG', '학개', 'Haggai', 'OLDT', '(학)', 2, '')
+,(38, 'KSKJB', 'ZEC', '스가랴', 'Zechariah', 'OLDT', '(슥)', 14, '')
+,(39, 'KSKJB', 'MAL', '말라기', 'Malachi', 'OLDT', '(말)', 4, '')
+
+insert into bible_book (book_id, version_id, book_code, name_ko, name_en, title, testament, book_abbr, chapter_count)
+values (40, 'KSKJB', 'MAT', '마태복음', 'Matthew', '성도 마태에 따른 복음 ', 'NEWT', '(마)', 28)
+,(41, 'KSKJB', 'MRK', '마가복음', 'Mark', '성도 마가에 따른 복음 ', 'NEWT', '(막)', 16)
+,(42, 'KSKJB', 'LUK',  '누가복음', 'Luke',  '성도 누가에 따른 복음 ', 'NEWT', '(눅)', 24)
+,(43, 'KSKJB', 'JHN',  '요한복음','John', '성도 요한에 따른 복음',  'NEWT', '(요)', 21 )
+,(44, 'KSKJB', 'ACT', '사도행전', 'Acts',  '사도들의 행적들 ', 'NEWT', '(행)', 28)
+,(45, 'KSKJB', 'ROM', '로마서', 'Romans',  '로마인들에게 보내는 사도 바울의 서신', 'NEWT', '(롬)', 16)
+,(46, 'KSKJB', '1CO', '고린도전서', '1 Corinthians', '고린도인들에게 보내는 사도 바울의 첫 번째 서신',  'NEWT', '(고전)', 16)
+,(47, 'KSKJB', '2CO', '고린도후서', '2 Corinthians', '고린도인들에게 보내는 사도 바울의 두 번째 서신',  'NEWT', '(고후)', 13)
+,(48, 'KSKJB', 'GAL', '갈라디아서', 'Galatians', '갈라디아인들에게 보내는 사도 바울의 서신',  'NEWT', '(갈)', 6)
+,(49, 'KSKJB', 'EPH', '에베소서', 'Ephesians',  '에베소인들에게 보내는 사도 바울의 서신', 'NEWT', '(엡)', 6)
+,(50, 'KSKJB', 'PHP', '빌립보서', 'Philippians', '빌립보인들에게 보내는 사도 바울의 서신',  'NEWT', '(빌)', 4)
+,(51, 'KSKJB', 'COL', '골로새서', 'Colossians',  '골로새인들에게 보내는 사도 바울의 서신', 'NEWT', '(골)', 4)
+,(52, 'KSKJB', '1TH', '데살로니가전서', '1 Thessalonians', '데살로니가인들에게 보내는 사도 바울의 첫 번째 서신', 'NEWT', '(살전)', 5)
+,(53, 'KSKJB', '2TH', '데살로니가후서', '2 Thessalonians',  '데살로니가인들에게 보내는 사도 바울의 두 번째 서신',  'NEWT', '(살후)', 3)
+,(54, 'KSKJB', '1TI',  '디모데전서', '1 Timothy', '디모데에게 보내는 사도 바울의 첫 번째 서신',  'NEWT', '(딤전)', 6)
+,(55, 'KSKJB', '2TI',  '디모데후서', '2 Timothy', '디모데에게 보내는 사도 바울의 두 번째 서신',   'NEWT', '(딤후)', 4)
+,(56, 'KSKJB', 'TIT',  '디도서', 'Titus',  '디도에게 보내는 바울의 서신',  'NEWT', '(딛)', 3)
+,(57, 'KSKJB', 'PHM', '빌레몬서', 'Philemon', '빌레몬에게 보내는 바울의 서신',  'NEWT', '(몬)', 1)
+,(58, 'KSKJB', 'HEB',  '히브리서', 'Hebrews',  '히브리인들에게 보내는 사도 바울의 서신',  'NEWT', '(히)', 13)
+,(59, 'KSKJB', 'JAS',  '야고보서', 'James',  '야고보의 일반 서신',  'NEWT', '(약)', 5)
+,(60, 'KSKJB', '1PE',  '베드로전서', '1 Peter',  '베드로의 첫 번째 일반 서신',  'NEWT', '(벧전)', 5)
+,(61, 'KSKJB', '2PE',  '베드로후서', '2 Peter',  '베드로의 두 번째 일반 서신',  'NEWT', '(벧후)', 3)
+,(62, 'KSKJB', '1JN',  '요한일서', '1 John',  '요한의 첫 번째 일반 서신',  'NEWT', '(요일)', 5)
+,(63, 'KSKJB', '2JN',  '요한이서', '2 John',  '요한의 두 번째 서신',  'NEWT', '(요이)', 1)
+,(64, 'KSKJB', '3JN',  '요한삼서', '3 John',  '요한의 세 번째 서신',  'NEWT', '(요삼)', 1)
+,(65, 'KSKJB', 'JUD',  '유다서', 'Jude', '유다의 일반 서신',   'NEWT', '(유)', 1)
+,(66, 'KSKJB', 'REV',  '요한계시록', 'Revelation', '하나님의 사람 성도 요한의 계시록',  'NEWT', '(계)', 22)
+ 
+**************************MYSQL 완료*******************************************************************************************************
+
+
+***********************미확인 ****************************************
+***********************공통코드****************************************
+
+
+DROP TABLE IF EXISTS COMMON_CODE
+ CREATE TABLE COMMON_CODE (
+    code_id INT AUTO_INCREMENT PRIMARY KEY, 
+    code_group VARCHAR(50),        -- 코드 그룹 (예: 국가 코드, 성별 코드)
+    code_name VARCHAR(100), 
+    code_value VARCHAR(20),        -- 코드 값 (예: 'KR', 'M', 'F')
+    code_desc VARCHAR(100), -- 코드 설명 (예: 'Korea', 'Male', 'Female')
+    order_no INT,
+    is_active CHAR(1) DEFAULT 'Y',             -- 활성화 여부 (예: 'Y', 'N')
+    upd_id VARCHAR(50), 
+    upd_dt TIMESTAMP DEFAULT NOW()   
+);
+ 
+------------------------------------------------------------------------------------------------------------------------------------- 
+ insert into COMMON_CODE(code_group, code_value, code_name, code_desc, upd_id)
+ values('OLDT',  '1',  '창세기', 'A01', 'admin')
+, ('OLDT', '2', '출애굽기', 'A01', 'admin') 
+,('OLDT', '3', '레위기', 'A01',  'admin') 
+,('OLDT', '4', '민수기', 'A01',  'admin') 
+,('OLDT', '5', '신명기', 'A01', 'admin') 
+,('OLDT', '6', '여호수아기', 'A01', 'admin') 
+,('OLDT', '7', '사사기', 'A01', 'admin') 
+,('OLDT', '8', '룻기', 'A01', 'admin') 
+,('OLDT', '9', '사무엘기상', 'A01', 'admin') 
+,('OLDT', '10', '사무엘기하', 'A01','admin') 
+,('OLDT', '11', '열왕기상', 'A01', 'admin') 
+,('OLDT', '12', '열왕기하', 'A01', 'admin') 
+,('OLDT', '13', '역대기상', 'A01', 'admin') 
+,('OLDT', '14', '역대기하', 'A01', 'admin') 
+,('OLDT', '15', '에스라', 'A01', 'admin') 
+,('OLDT', '16', '느헤미야기', 'A01', 'admin') 
+,('OLDT', '17', '에스더기', 'A01', 'admin') 
+,('OLDT', '18', '욥기', 'A01', 'admin') 
+,('OLDT', '19', '시편', 'A01', 'admin') 
+,('OLDT', '20', '잠언', 'A01', 'admin') 
+,('OLDT', '21', '전도서', 'A01', 'admin') 
+,('OLDT', '22', '솔로몬의 아가', 'A01', 'admin') 
+,('OLDT', '23', '이사야서', 'A01', 'admin') 
+,('OLDT', '24', '예레미야서', 'A01', 'admin') 
+,('OLDT', '25', '예레미야 애가', 'A01', 'admin') 
+,('OLDT', '26', '에스겔서', 'A01', 'admin') 
+,('OLDT', '27', '다니엘서', 'A01', 'admin') 
+,('OLDT', '28', '호세아', 'A01', 'admin') 
+,('OLDT', '29', '요엘',  'A01','admin') 
+,('OLDT', '30', '아모스', 'A01', 'admin') 
+,('OLDT', '31', '오바댜', 'A01', 'admin') 
+,('OLDT', '32', '요나', 'A01', 'admin') 
+,('OLDT', '33', '미가', 'A01', 'admin') 
+,('OLDT', '34', '나훔', 'A01', 'admin') 
+,('OLDT', '35', '하박국', 'A01', 'admin') 
+,('OLDT', '36', '스바냐', 'A01', 'admin') 
+,('OLDT', '37', '학개',  'A01','admin') 
+,('OLDT', '38', '스가랴', 'A01', 'admin') 
+,('OLDT', '39', '말라기', 'A01', 'admin') 
+
+
+
+
+insert into COMMON_CODE(code_group, code_value, code_name,  code_desc, upd_id) values
+('NEWT', '40', '마태복음', 'A01', 'admin') 
+,('NEWT', '41', '마가복음', 'A01', 'admin') 
+,('NEWT', '42', '누가복음', 'A01', 'admin') 
+,('NEWT', '43', '요한복음', 'A01', 'admin') 
+,('NEWT', '44', '사도행전', 'A01', 'admin') 
+,('NEWT', '45', '로마서', 'A01', 'admin') 
+,('NEWT', '46', '고린도전서', 'A01', 'admin') 
+,('NEWT', '47', '고린도후서', 'A01', 'admin') 
+,('NEWT', '48', '갈라디아서', 'A01', 'admin') 
+,('NEWT', '49', '에베소서', 'A01', 'admin') 
+,('NEWT', '50', '빌립보서', 'A01', 'admin') 
+,('NEWT', '51', '골로새서', 'A01', 'admin') 
+,('NEWT', '52', '데살로니가전서', 'A01', 'admin') 
+,('NEWT', '53', '데살로니가후서', 'A01', 'admin') 
+,('NEWT', '54', '디모데전서', 'A01', 'admin') 
+,('NEWT', '55', '디모데후서', 'A01', 'admin') 
+,('NEWT', '56', '디도서', 'A01', 'admin') 
+,('NEWT', '57', '빌레몬서', 'A01', 'admin') 
+,('NEWT', '58', '히브리서', 'A01', 'admin') 
+,('NEWT', '59', '야고보서', 'A01', 'admin') 
+,('NEWT', '60', '베드로전서', 'A01', 'admin') 
+,('NEWT', '61', '베드로후서', 'A01', 'admin') 
+,('NEWT', '62', '요한일서', 'A01', 'admin') 
+,('NEWT', '63', '요한이서', 'A01', 'admin') 
+,('NEWT', '64', '요한삼서', 'A01', 'admin') 
+,('NEWT', '65', '유다서', 'A01', 'admin') 
+,('NEWT', '66', '요한계시록', 'A01', 'admin') 
+
+
+
+update common_code set order_no = code_id where code_group in ('OLDT', 'NEWT')
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values ('OLDT', '1', '창세기', 'admin')
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '2', '출애굽기', 'admin')
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '3', '레위기', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '4', '민수기', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '5', '신명기', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '6', '여호수아기', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '7', '사사기', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '8', '룻기', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '9', '사무엘기상', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '10', '사무엘기하', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '11', '열왕기상', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '12', '열왕기하', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '13', '역대기상', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '14', '역대기하', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '15', '에스라', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '16', '느헤미야기', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '17', '에스더기', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '18', '욥기', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '19', '시편', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '20', '잠언', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '21', '전도서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '22', '솔로몬의 아가', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '23', '이사야서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '24', '예레미야서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '25', '예레미야 애가', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '26', '에스겔서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '27', '다니엘서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '28', '호세아', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '29', '요엘', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '30', '아모스', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '31', '오바댜', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '32', '요나', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '33', '미가', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '34', '나훔', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '35', '하박국', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '36', '스바냐', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '37', '학개', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '38', '스가랴', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('OLDT', '39', '말라기', 'admin') 
+
+
+
+update common_code set order_no = code_id where code_group in ('OLDT', 'NEWT')
+
+-------------------------------------------------------------------------------------------------------------------------------------
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '40', '마태복음', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '41', '마가복음', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '42', '누가복음', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '43', '요한복음', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '44', '사도행전', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '45', '로마서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '46', '고린도전서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '47', '고린도후서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '48', '갈라디아서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '49', '에베소서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '50', '빌립보서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '51', '골로새서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '52', '데살로니가전서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '53', '데살로니가후서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '54', '디모데전서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '55', '디모데후서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '56', '디도서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '57', '빌레몬서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '58', '히브리서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '59', '야고보서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '60', '베드로전서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '61', '베드로후서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '62', '요한일서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '63', '요한이서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '64', '요한삼서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '65', '유다서', 'admin') 
+insert into COMMON_CODE(code_group, code_value, code_desc, upd_id) values('NEWT', '66', '요한계시록', 'admin') 
+    
+
+
+update common_code set order_no = code_id where code_group in ('OLDT', 'NEWT')
+
+-------------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,11 @@
+$cyan-100	#cff4fc
+$cyan-200	#9eeaf9
+$cyan-300	#6edff6
+$cyan-400	#3dd5f3
+$cyan-500	#0dcaf0
+$cyan-600	#0aa2c0
+$cyan-700	#087990
+$cyan-800	#055160
+$cyan-900	#032830
+
+ 

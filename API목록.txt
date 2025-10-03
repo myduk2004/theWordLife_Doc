@@ -1,0 +1,6 @@
+
+
+/bible/versions -성경버전 정보 조회 
+/bible/{versionId}/books   - 성경버전에 따른 책 정보조회 - 파라메터 : versionId  
+/bible/verse - 성경조회 (versionId + bookId + chapter + versefrom + verseTo) -> versionId 멀티서치
+ 

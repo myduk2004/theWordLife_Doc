@@ -1,0 +1,169 @@
+
+** controller ** 
+
+
+1. HTTP 메서드에 맞는 의미 있는 이름
+
+GET → get, fetch, list, read
+POST → create, register, add
+PUT/PATCH → update, modify, change
+DELETE → delete, remove
+
+
+2. 
+도메인 중심 명사 사용 (예: User, Post 등)
+핵심은 명확한 동작 표현 + URL 경로의 역할 분리
+
+--------------------------------------------------------------------------
+기능		URL		HTTP		함수명 예시
+--------------------------------------------------------------------------
+사용자 단건 조회	/users/{id}	GET		getUser()
+사용자 목록 조회	/users		GET		getAllUsers() 또는 listUsers()
+사용자 등록	/users		POST		createUser() 또는 registerUser()
+사용자 정보 수정	/users/{id}	PUT/PATCH	updateUser()
+사용자 삭제	/users/{id}	DELETE		deleteUser()
+로그인		/login		POST		login()
+비밀번호 변경	/users/{id}/password	PUT	changePassword()
+
+--------------------------------------------------------------------------
+기능		함수명 예시
+--------------------------------------------------------------------------
+검색		searchUsers(), findUsersByName()
+상태 변경		activateUser(), deactivateUser()
+파일 업로드	uploadProfileImage()
+페이징 목록	getUsersByPage()
+특정 조건 필터링	filterUsersByRole()
+
+
+
+
+
+
+
+** service  ** 
+
+동사 + 목적어 형식 사용
+→ 함수는 동작을 하므로 보통 동사로 시작
+예: createUser(), updateOrderStatus(), deletePost()
+
+
+✅ 기본 네이밍 원칙
+1. 동사 + 목적어 형태
+createUser(), updatePost(), deleteOrder(), getUserById()
+
+2. 의도를 드러내는 이름 사용
+단순한 CRUD 이상이라면 목적/조건을 분명히 표현
+예: assignRoleToUser(), calculateDiscount(), sendVerificationEmail()
+
+3. Boolean 반환일 경우 is/has/exists 패턴
+isEmailAvailable(), hasPermission(), existsByUsername()
+
+
+--------------------------------------------------------------------------
+기능구분		함수명 예시
+--------------------------------------------------------------------------
+생성(Create)	createUser(), registerPost(), saveProduct()
+조회(Read)	getUserById(), findPostsByTag(), listOrders()
+수정(Update)	updateUserProfile(), changePassword(), modifyOrderStatus()
+삭제(Delete)	deleteUser(), removePost(), cancelOrder()
+
+상태 검사		isUserActive(), hasRole(), existsByEmail()
+기타 비즈니스 로직	calculateTotalPrice(), sendWelcomeEmail(), generateToken()
+   
+등록(Create)	createUser(), registerPost()	생성 또는 등록
+조회(Read)	getUserById(), findPostsByTag()	단건 또는 조건별 조회
+수정(Update)	updateProfile(), changePassword()	데이터 변경
+삭제(Delete)	deleteUser(), removeComment()	데이터 삭제
+유효성 검사	isValidEmail(), checkPasswordMatch()	특정 조건 검사
+존재 여부 검사	existsByUsername(), hasRole()
+
+
+** Repository 메서드명 ** 
+
+💡 패턴: findBy, existsBy, countBy, deleteBy + 필드명
+
+--------------------------------------------------------------------------------------------------------
+목적		메서드 패턴 예시				설명
+--------------------------------------------------------------------------------------------------------
+단건 조회		findByEmail(String email)			이메일로 엔티티 조회
+다건 조회		findAllByStatus(String status)			상태별로 목록 조회
+존재 확인		existsByUsername(String username)		존재 여부 Boolean 반환
+개수 조회		countByStatus(String status)			상태별 개수 반환
+삭제		deleteByCreatedAtBefore(LocalDate date)	조건에 따라 삭제
+
+
+
+✅ 조합 예시
+--------------------------------------------------------------------------------------------------------
+조건		메서드 예시
+--------------------------------------------------------------------------------------------------------
+단일 필드		findByUsername(String username)
+AND 조건	findByUsernameAndEmail(String username, String email)
+OR 조건		findByStatusOrRole(String status, String role)
+정렬 포함		findAllByOrderByCreatedAtDesc()
+페이징		Page<User> findByStatus(String status, Pageable pageable)
+IN 조건		findByIdIn(List<Long> ids)
+BETWEEN 조건	findByCreatedAtBetween(LocalDate start, LocalDate end)
+
+
+
+
+count, delete, deleteAll, deleteAllById, deleteById, existsById, findById, save
+findAll
+findAllById
+saveAll
+
+
+findOne
+findBy
+exists
+count
+
+--------------------------------------------------------------------------------------------------------
+
+
+✅ 1. HTML 파일명 네이밍 규칙
+📌 규칙
+소문자 사용
+
+단어는 하이픈(-)으로 구분 (snake_case는 지양)
+
+역할 또는 뷰 중심 네이밍
+
+RESTful URL과 유사하게 지을 것
+
+
+
+src/main/resources/templates/
+├── user/
+│   ├── user-list.html
+│   ├── user-detail.html
+│   ├── user-form.html
+│   └── login.html
+├── post/
+│   ├── post-list.html
+│   ├── post-detail.html
+│   └── post-form.html
+└── common/
+    ├── header.html
+    ├── footer.html
+    └── layout.html
+
+
+
+
+✅ 2. 대표 네이밍 패턴
+
+--------------------------------------------------------------------------------------------------------
+기능		파일명 예시
+--------------------------------------------------------------------------------------------------------
+목록 조회		entity-list.html
+단건 상세		entity-detail.html
+생성/수정 폼	entity-form.html, entity-edit.html, entity-create.html
+로그인		login.html
+대시보드		dashboard.html
+오류 페이지	error.html, 404.html, access-denied.html
+
+
+
+
