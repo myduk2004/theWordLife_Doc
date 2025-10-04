@@ -4,8 +4,8 @@
   "settings": {
     "width": 4000,
     "height": 4000,
-    "scrollTop": -2084,
-    "scrollLeft": 0,
+    "scrollTop": -1515,
+    "scrollLeft": -259,
     "zoomLevel": 1,
     "show": 431,
     "database": 4,
@@ -589,7 +589,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1759466419721,
+          "updateAt": 1759578299962,
           "createAt": 1759324966281
         }
       },
@@ -4034,20 +4034,20 @@
       "xH9ihnjcbpyWmurij96-X": {
         "id": "xH9ihnjcbpyWmurij96-X",
         "tableId": "aN7EwsjUCbfVNUFf_kIsb",
-        "name": "topic_type",
+        "name": "prayer_type",
         "comment": "기도종류(PRY:일반기도, THK:감사, INT:중보,REP:회개,WOR:예배기도)",
         "dataType": "CHAR(3)",
         "default": "",
         "options": 8,
         "ui": {
           "keys": 0,
-          "widthName": 60,
+          "widthName": 64,
           "widthComment": 363,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1759466212201,
+          "updateAt": 1759578690275,
           "createAt": 1759324989391
         }
       },

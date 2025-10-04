@@ -54,8 +54,8 @@ CREATE TABLE Prayer
 CREATE TABLE Prayer_topic
 (
   prayer_id     BIGINT       NOT NULL COMMENT '기도id',
-  topic_id      BIGINT       NOT NULL  AUTO_INCREMENT COMMENT '기도제목id',
-  topic_type    CHAR(3)      NOT NULL COMMENT '기도종류(PRY:일반기도, THK:감사, INT:중보,REP:회개,WOR:예배기도)',
+  topic_id      BIGINT       NOT NULL AUTO_INCREMENT COMMENT '기도제목id',
+  prayer_type   CHAR(3)      NOT NULL COMMENT '기도종류(PRY:일반기도, THK:감사, INT:중보,REP:회개,WOR:예배기도)',
   topic         VARCHAR(300) NOT NULL COMMENT '기도제목',
   target_name   VARCHAR(100) NULL     COMMENT '기도대상명(중보기도시)',
   answer_status CHAR(1)      NOT NULL COMMENT '응답상태',
@@ -67,8 +67,6 @@ CREATE TABLE Prayer_topic
   upd_dt        DATETIME     NULL     DEFAULT  CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일',
   PRIMARY KEY (topic_id)
 ) COMMENT '기도제목';
-
-
 
 
 
